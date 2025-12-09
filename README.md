@@ -10,7 +10,7 @@ This is the official repository for the paper:"Why Do Multilingual Reasoning Gap
 ## Overview
 
 This repository will contain the full implementation and resources for our paper.
-All code, models, and datasets will be released within November 2025. Stay tuned! 🚀
+All code, models, and datasets will be released by 12/20, 2025. Stay tuned! 🚀
 
 ---
 
