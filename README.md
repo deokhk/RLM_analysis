@@ -13,7 +13,7 @@ Deokhyung Kang, Seonjeong Hwang, Daehui Kim, Hyounghun Kim, Gary Geunbae Lee
 
 ## Overview
 
-This repository provides the **analysis, detection, and mitigation framework** proposed in the paper  
+This repository provides the **analysis, detection, and mitigation framework** proposed in the paper:
 *Why Do Multilingual Reasoning Gaps Emerge in Reasoning Language Models?*
 
 The repository is designed as a **paper-aligned companion repository**, enabling direct and faithful reproduction of the paper’s main experimental results.
@@ -62,12 +62,12 @@ The repository structure is organized to closely mirror the paper’s experiment
 
 ```
 RLM_analysis/
-├── experiments/              # Guide for reproducing paper is provided here
-├── misc/     # Where your lid.176.ftz file to be placed
-├── outputs/    # Where output for every experiments will be saved 
-├── src/      # Source codes
-├── translated_data/    # Translated query
-└── pyproject.toml # For installing requirements
+├── experiments/              # Guide for reproducing the paper is provided here
+├── misc/                     # Where the lid.176.ftz file should be placed
+├── outputs/                  # Where outputs for all experiments will be saved
+├── src/                      # Source code
+├── translated_data/          # Translated queries
+└── pyproject.toml            # For installing requirements
 ```
 
 Each major component under the ./experiments directory corresponds to a section of the paper:
@@ -90,7 +90,7 @@ To facilitate reproducibility, we provide pretrained models and experiment outpu
 
 ### 1. Experiment Outputs and Prober Checkpoints  
 
-We release experiment outputs on **Qwen3-4B**, including **prober checkpoints** and intermediate results, as Hugging Face <img src="assets/hf_image.png" alt="Hugging Face" width="18" style="vertical-align: middle;"/> dataset: [**deokhk/multilingual_reasoning_gap_outputs**](https://huggingface.co/datasets/deokhk/multilingual_reasoning_gap_outputs)
+We release experiment outputs for **Qwen3-4B**, including **prober checkpoints** and intermediate results, as a Hugging Face <img src="assets/hf_image.png" alt="Hugging Face" width="18" style="vertical-align: middle;"/> dataset: [**deokhk/multilingual_reasoning_gap_outputs**](https://huggingface.co/datasets/deokhk/multilingual_reasoning_gap_outputs)
 
 You may download and place these files directly under:
 
@@ -160,5 +160,5 @@ If you find this work useful, please cite:
 
 ## License
 
-This project is released under Apache 2.0.
+This project is released under the Apache 2.0 License.
 Please refer to individual datasets and model licenses for their respective terms.
