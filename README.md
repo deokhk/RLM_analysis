@@ -13,7 +13,6 @@ Deokhyung Kang, Seonjeong Hwang, Daehui Kim, Hyounghun Kim, Gary Geunbae Lee
 
 ## Overview
 
-<<<<<<< HEAD
 This repository provides the **analysis, detection, and mitigation framework** proposed in the paper  
 *Why Do Multilingual Reasoning Gaps Emerge in Reasoning Language Models?*
 
@@ -26,10 +25,6 @@ Specifically, this repo supports:
 
 Each major section of the paper is mapped to a corresponding directory with a dedicated README explaining how to reproduce the results step by step.
 
-=======
-This repository will contain the full implementation and resources for our paper.
-All code, models, and datasets will be released by 12/20, 2025. Stay tuned! 🚀
->>>>>>> 5e4a0942138dadfa15472e21e2d5d4355bd4df0d
 
 ---
 
