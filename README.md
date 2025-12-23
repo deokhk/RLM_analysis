@@ -32,12 +32,20 @@ Each major section of the paper is mapped to a corresponding directory with a de
 
 ### Environment Setup
 
-All experiments can be run using **Conda** with Python 3.12.
+All experiments can be run in a **Conda** environment with Python 3.12.
 
 ```bash
 conda create -n rlm_analysis python=3.12
 conda activate rlm_analysis
 
+pip install -e .
+```
+
+Next, install a modified version of fastText that is compatible with numpy>=2.0.
+
+```bash
+git clone https://github.com/deokhk/fastText_numpy_2.0.git
+cd fastText_numpy_2.0
 pip install -e .
 ```
 
