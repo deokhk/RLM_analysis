@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Compute U/G/R shares (sum to 1) per (model, dataset, language) from mean/std JSONs,
-with an option to restrict analysis to languages that differ significantly from English
+with an option to restrict analysis to languages that differ significantly from the best-performing language (the "ceiling" language, usually English)
 under Base via Welch's t-test (p < 0.05 by default).
 
 Inputs (mean & std JSON structure):
@@ -49,14 +49,14 @@ Notes:
 - If std JSON + sample size n are provided with --weighting=hard|soft, Welch t-tests
   are used to (optionally) weight φ_U, φ_T. Sum-to-1 is preserved by defining φ_R = H - φ_U - φ_T.
 - --compute_significant_language_only filters languages to those with p<alpha
-  when comparing Base(lang) vs Base(en) via Welch's t-test.
+  when comparing Base(lang) vs Base(ceiling_language) via Welch's t-test.
 """
 
 import argparse
 import json
 import math
 import os
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 
 # ---------- Optional Welch t-test helpers (scipy if available; else normal approx fallback) ----------
 def try_scipy_cdf():
@@ -92,39 +92,57 @@ def welch_t_pvalue(mean1, std1, n1, mean2, std2, n2) -> float:
         return float(max(min(p, 1.0), 0.0))
 
 # ---------- Core computation ----------
-def filter_langs_by_significance(
+
+def get_base_ceiling_language(base_mean: Dict[str, Any], langs_all: List[str]) -> Tuple[str, float]:
+    """
+    Return (ceiling_language, ceiling_score) under Base, excluding 'Avg' by construction.
+    If ties occur, picks the first one in sorted order for determinism.
+    """
+    candidates: List[Tuple[str, float]] = []
+    for l in langs_all:
+        v = base_mean.get(l, None)
+        if isinstance(v, (int, float)):
+            candidates.append((l, float(v)))
+    if not candidates:
+        raise ValueError("No valid Base scores to determine ceiling language.")
+    # Sort by (-score, lang) for deterministic tie-breaking
+    candidates.sort(key=lambda x: (-x[1], x[0]))
+    return candidates[0][0], candidates[0][1]
+
+
+def filter_langs_by_significance_to_ceiling(
     model: str,
     dset: str,
     langs_all: List[str],
     means: Dict[str, Any],
     stds: Dict[str, Any],
     n: int,
-    alpha: float
+    alpha: float,
+    ceiling_lang: str,
 ) -> List[str]:
-    """Keep only languages with Base(lang) differing from Base(en) at p<alpha.
-       Excludes 'Avg' by construction and uses 'en' as the reference.
-       If en or stds are missing, raises ValueError to keep behavior explicit."""
-    if "en" not in langs_all:
-        raise ValueError(f"[{model} / {dset}] 'en' not found in Base for significance filtering.")
-
+    """
+    Keep only languages with Base(lang) differing from Base(ceiling_lang) at p<alpha.
+    Excludes 'Avg' by construction and uses the Base ceiling language as the reference.
+    """
     base_mean = means[model][dset]["Base"]
     base_std  = stds[model][dset]["Base"]
-    if "en" not in base_std:
-        raise ValueError(f"[{model} / {dset}] std for 'en' not found in Base for significance filtering.")
+    if ceiling_lang not in base_mean or ceiling_lang not in base_std:
+        raise ValueError(f"[{model} / {dset}] ceiling language '{ceiling_lang}' missing mean/std in Base.")
 
     kept = []
-    mean_en = base_mean["en"]
-    std_en  = base_std["en"]
+    mean_ref = base_mean[ceiling_lang]
+    std_ref  = base_std[ceiling_lang]
 
     for l in langs_all:
-        if l == "en":
-            # Usually we don't test but this is needed below for "maximum" calculations
-            kept.append("en")
+        if l == ceiling_lang:
+            # Keep the reference in the returned list (useful for later ceiling computations),
+            # though we typically skip analyzing it downstream.
+            kept.append(l)
             continue
         if l not in base_std:
             # If std missing for a language, skip it under the strict filter
             continue
-        p = welch_t_pvalue(base_mean[l], base_std[l], n, mean_en, std_en, n)
+        p = welch_t_pvalue(base_mean[l], base_std[l], n, mean_ref, std_ref, n)
         if p < alpha:
             kept.append(l)
     return kept
@@ -135,7 +153,7 @@ def compute_shapley_and_shares(
     n: Optional[int],
     alpha: float,
     weighting: str,                 # "none" | "hard" | "soft"
-    compute_sig_only: bool          # filter languages by Base(lang) vs Base(en) significance
+    compute_sig_only: bool          # filter languages by Base(lang) vs Base(ceiling) significance
 ) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
 
@@ -154,14 +172,21 @@ def compute_shapley_and_shares(
             # Candidate language list (exclude "Avg")
             langs_all = [k for k in base.keys() if k.lower() != "avg"]
 
+            # Determine ceiling language under Base (from all languages, not just non-English)
+            try:
+                ceil_lang, base_max = get_base_ceiling_language(base, langs_all)
+            except ValueError:
+                continue
+
             # Optional significance filter vs English on Base
             if compute_sig_only:
                 if stds is None or n is None:
                     raise ValueError("--compute_significant_language_only requires --std_json and --n.")
                 try:
-                    langs = filter_langs_by_significance(
+                    langs = filter_langs_by_significance_to_ceiling(
                         model=model, dset=dset, langs_all=langs_all,
-                        means=means, stds=stds, n=n, alpha=alpha
+                        means=means, stds=stds, n=n, alpha=alpha,
+                        ceiling_lang=ceil_lang,
                     )
                 except ValueError as e:
                     # If filtering cannot be applied due to data issues, fall back to empty set
@@ -172,22 +197,15 @@ def compute_shapley_and_shares(
             else:
                 langs = langs_all
 
-            # BaseMax across (possibly filtered) languages; if the set is empty, we fall back to langs_all
-            base_candidates = langs if langs else langs_all
-            base_max_vals = [base.get(l, float("-inf")) for l in base_candidates if isinstance(base.get(l), (int, float))]
-            if not base_max_vals:
-                # No valid language scores → skip this dataset
-                continue
-            base_max = max(base_max_vals)
-
             per_lang = {}
             sum_phiU_Hw, sum_phiT_Hw, sum_phiR_Hw = 0.0, 0.0, 0.0
             sum_H = 0.0
 
             for l in langs:
-                if l == "en":
-                    # We do not analyze English itself; skip from per_lang
+                if l == ceil_lang:
+                    # Actually, ceiling language does not have any impact since H=0. So we skip it here too.
                     continue
+
                 S0  = base.get(l, None)
                 SU  = u.get(l, None)
                 ST  = t.get(l, None)
@@ -251,7 +269,6 @@ def compute_shapley_and_shares(
                     R_share = phi_R / H
                 else:
                     print("Warning: H=0 for", model, dset, l, "; setting U/G/R shares to 0.")
-                    breakpoint()
                     U_share = G_share = R_share = 0.0
 
                 per_lang[l] = {
@@ -310,7 +327,7 @@ def main():
     p.add_argument("--weighting", choices=["none", "hard", "soft"], default="none",
                    help="Use Welch t-tests to weight φ_U, φ_T")
     p.add_argument("--compute_significant_language_only", action="store_true",
-                   help="Analyze only languages with Base(lang) significantly different from Base(en) at p<alpha.")
+                   help="Analyze only languages with Base(lang) significantly different from Base(ceiling) at p<alpha.")
     args = p.parse_args()
 
     print("Loading means from", args.mean_json)
@@ -338,5 +355,6 @@ def main():
     with open(save_path, "w", encoding="utf-8") as f:
         json.dump(shares, f, ensure_ascii=False, indent=2)
 
+    print("Saved shares JSON to", save_path)
 if __name__ == "__main__":
     main()
