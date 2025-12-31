@@ -77,12 +77,12 @@ These outputs are used to reproduce:
 
 ---
 
-## 3. Residual Analysis (Figure 2)
+## 3. Stage-wise Attribution Analysis (Figure 2)
 
-To perform the residual analysis described in the paper, run:
+To perform the stage-wise attribution analysis described in the paper, run:
 
 ```bash
-bash 3_residual_analysis.sh
+bash 3_stage_wise_attribution_analysis.sh
 ```
 
 Please set:

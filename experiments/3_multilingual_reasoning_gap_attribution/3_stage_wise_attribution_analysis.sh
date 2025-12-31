@@ -3,10 +3,10 @@
 # Set path accordingly
 MEAN_JSON_PATH=/home/deokhk/research/RLM_analysis/outputs/multilingual_reasoning_mean.json
 STD_JSON_PATH=/home/deokhk/research/RLM_analysis/outputs/multilingual_reasoning_std.json
-OUTPUT_DIR=/home/deokhk/research/RLM_analysis/outputs/experiments/residual_analysis
+OUTPUT_DIR=/home/deokhk/research/RLM_analysis/outputs/experiments/attribution_analysis
 N=3
 
-python -m rlm_analysis.multilingual_reasoning_gap_attribution.residual_analysis --mean_json $MEAN_JSON_PATH \
+python -m rlm_analysis.multilingual_reasoning_gap_attribution.stage_wise_attribution_analysis --mean_json $MEAN_JSON_PATH \
 --std_json $STD_JSON_PATH \
 --output_dir $OUTPUT_DIR \
 --n $N \
