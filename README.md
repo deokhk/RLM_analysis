@@ -2,12 +2,18 @@
 
 ![Paper Banner](assets/overview.png)
 
+
 This is the official repository for the paper:
 
 **Why Do Multilingual Reasoning Gaps Emerge in Reasoning Language Models?**  
 Deokhyung Kang, Seonjeong Hwang, Daehui Kim, Hyounghun Kim, Gary Geunbae Lee  
 
 📄 [[arXiv:2510.27269](https://arxiv.org/abs/2510.27269)]
+
+---
+
+## News
+- 🎉 **[Apr 2026]** Our paper has been accepted to *ACL 2026 Findings*!
 
 ---
 
