@@ -159,10 +159,10 @@ Please refer to the README inside each section directory for detailed, step-by-s
 If you find this work useful, please cite:
 
 ```bibtex
-@misc{kang2025multilingualreasoninggapsemerge,
+@misc{kang2026multilingualreasoninggapsemerge,
       title={Why Do Multilingual Reasoning Gaps Emerge in Reasoning Language Models?}, 
       author={Deokhyung Kang and Seonjeong Hwang and Daehui Kim and Hyounghun Kim and Gary Geunbae Lee},
-      year={2025},
+      year={2026},
       eprint={2510.27269},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
