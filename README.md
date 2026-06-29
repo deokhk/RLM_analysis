@@ -159,14 +159,26 @@ Please refer to the README inside each section directory for detailed, step-by-s
 If you find this work useful, please cite:
 
 ```bibtex
-@misc{kang2026multilingualreasoninggapsemerge,
-      title={Why Do Multilingual Reasoning Gaps Emerge in Reasoning Language Models?}, 
-      author={Deokhyung Kang and Seonjeong Hwang and Daehui Kim and Hyounghun Kim and Gary Geunbae Lee},
-      year={2026},
-      eprint={2510.27269},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2510.27269}, 
+@inproceedings{kang-etal-2026-multilingual,
+    title = "Why Do Multilingual Reasoning Gaps Emerge in Reasoning Language Models?",
+    author = "Kang, Deokhyung  and
+      Hwang, Seonjeong  and
+      Kim, Daehui  and
+      Kim, Hyounghun  and
+      Lee, Gary",
+    editor = "Liakata, Maria  and
+      Moreira, Viviane P.  and
+      Zhang, Jiajun  and
+      Jurgens, David",
+    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2026",
+    month = jul,
+    year = "2026",
+    address = "San Diego, California, United States",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.findings-acl.1586/",
+    pages = "31684--31716",
+    ISBN = "979-8-89176-395-1",
+    abstract = "Reasoning language models (RLMs) achieve strong performance on complex reasoning tasks, yet they still exhibit a multilingual reasoning gap, performing better in high-resource languages than in low-resource ones. While recent efforts have been made to address this gap, its underlying causes remain largely unexplored. In this work, we show that this gap primarily stems from failures in language understanding{---}specifically, the model{'}s inability to translate multilingual inputs into the language dominating its reasoning traces (typically English). As identifying understanding failures can enable targeted mitigation of the gap, we evaluate a range of detection methods and find that understanding failures are detectable to a meaningful extent, with supervised approaches performing best. Building on this, we propose Selective Translation, a strategy that incorporates an English translation into the initial reasoning trace when an understanding failure is detected. Experimental results using Qwen3-4B show that Selective Translation substantially bridges the multilingual reasoning gap, achieving near full-translation performance while translating only about 20{\%} of inputs. Together, our results show that failures in language understanding are the primary driver of the multilingual reasoning gap and can be detected and selectively mitigated, clarifying its origin and suggesting a path toward more equitable multilingual reasoning."
 }
 ```
 
